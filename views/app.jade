@@ -1,0 +1,58 @@
+extends layout
+
+block content
+	header#main-header
+		div#account-name
+			img(src=picSrc)
+			span @#{accountName}
+		div#header-buttons
+			div.header-btn
+				div#tweets-btn.button-icon.selected
+			div.header-btn
+				div#mentions-btn.button-icon
+			//-div.header-btn
+				div#favorites-btn.button-icon
+			//-div.header-btn
+				div#retweets-btn.button-icon
+			//-div.header-btn
+				div#follows-btn.button-icon
+
+	section#main-section.swipe
+		div.swipe-wrap
+			section#tweets.info-box
+				div.content
+					div.tweet-item Loading...
+
+			section#mentions.info-box
+				div.content
+					div.tweet-item Loading...
+
+			section#favorites.info-box
+				div.content
+					div.tweet-item Loading...
+
+			section#retweets.info-box
+				div.content
+					div.tweet-item Loading...
+
+			section#follows.info-box
+				div.content
+					div.tweet-item Loading...
+
+	footer#bottom-menu
+		section
+			div.home-btn.bottom-btn &nbsp;
+			div.account-btn
+				div.inner-account-btn A
+			div.extreme-btn.bottom-btn X
+		section#account-list
+		section#account-adder
+			span#add-account-btn + Add Account
+
+	section#auth-overlay
+		div#close-overlay X
+		div#auth-box
+		div#overlay-bg-cover
+
+	script(src="javascripts/swipe.js")
+	script(src="javascripts/main.js")

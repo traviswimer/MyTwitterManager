@@ -1,0 +1,346 @@
+body{
+	background-color: #0091e5;
+	margin: 0;
+	padding: 0;
+	font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+
+a{
+	color: #00B7FF;
+}
+
+#main-header{
+	background-color: #4A4A4A;
+	position: fixed;
+	z-index: 999;
+	width: 100%;
+}
+	#account-name{
+		color: #FFF;
+		font-size: 1.2em;
+		font-weight: bold;
+		height: 30px;
+		line-height: 30px;
+	}
+	#account-name img{
+		float: left;
+		height: 25px;
+		margin: 2px 4px 0 4px;
+	}
+	#header-buttons{
+		background: rgb(119,119,119); /* Old browsers */
+		background: -moz-linear-gradient(top,  rgba(119,119,119,1) 0%, rgba(68,68,68,1) 100%); /* FF3.6+ */
+		background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(119,119,119,1)), color-stop(100%,rgba(68,68,68,1))); /* Chrome,Safari4+ */
+		background: -webkit-linear-gradient(top,  rgba(119,119,119,1) 0%,rgba(68,68,68,1) 100%); /* Chrome10+,Safari5.1+ */
+		background: -o-linear-gradient(top,  rgba(119,119,119,1) 0%,rgba(68,68,68,1) 100%); /* Opera 11.10+ */
+		background: -ms-linear-gradient(top,  rgba(119,119,119,1) 0%,rgba(68,68,68,1) 100%); /* IE10+ */
+		background: linear-gradient(to bottom,  rgba(119,119,119,1) 0%,rgba(68,68,68,1) 100%); /* W3C */
+		filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#777777', endColorstr='#444444',GradientType=0 ); /* IE6-9 */
+
+		border-bottom: 1px solid #333;
+		height: 45px;
+		margin: 0 auto;
+		text-align: center;
+	}
+	.header-btn{
+		cursor: pointer;
+		display: inline-block;
+		font-size: 1.4em;
+		height: 100%;
+		text-align: center;
+		width: 19%;
+	}
+	.header-btn:not(:last-child){
+		border-right: 1px solid #333;
+	}
+	.header-btn:hover{
+		background: rgb(158,158,158); /* Old browsers */
+		background: -moz-linear-gradient(top,  rgba(158,158,158,1) 0%, rgba(96,96,96,1) 100%); /* FF3.6+ */
+		background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(158,158,158,1)), color-stop(100%,rgba(96,96,96,1))); /* Chrome,Safari4+ */
+		background: -webkit-linear-gradient(top,  rgba(158,158,158,1) 0%,rgba(96,96,96,1) 100%); /* Chrome10+,Safari5.1+ */
+		background: -o-linear-gradient(top,  rgba(158,158,158,1) 0%,rgba(96,96,96,1) 100%); /* Opera 11.10+ */
+		background: -ms-linear-gradient(top,  rgba(158,158,158,1) 0%,rgba(96,96,96,1) 100%); /* IE10+ */
+		background: linear-gradient(to bottom,  rgba(158,158,158,1) 0%,rgba(96,96,96,1) 100%); /* W3C */
+		filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#9e9e9e', endColorstr='#606060',GradientType=0 ); /* IE6-9 */
+
+	}
+		.button-icon{
+			background: url("../images/buttons.png") no-repeat;
+			background-size: 600% 200%;
+			height: 45px;
+			margin: 0 auto;
+			width: 45px;
+		}
+		#tweets-btn{
+			background-position: -5px 0;
+		}
+			#tweets-btn.selected{
+				background-position: -5px -45px;
+			}
+		#mentions-btn{
+			background-position: -58px 0;
+		}
+			#mentions-btn.selected{
+				background-position: -58px -45px;
+			}
+		#favorites-btn{
+			background-position: -113px 0;
+		}
+			#favorites-btn.selected{
+				background-position: -113px -45px;
+			}
+		#retweets-btn{
+			background-position: -168px 0;
+		}
+			#retweets-btn.selected{
+				background-position: -168px -45px;
+			}
+		#follows-btn{
+			background-position: -223px 0;
+		}
+			#follows-btn.selected{
+				background-position: -223px -45px;
+			}
+
+#main-section{
+	padding: 80px 0 10px;
+}
+	.swipe {
+		overflow: hidden;
+		position: relative;
+		visibility: hidden;
+	}
+		.swipe-wrap {
+			overflow: hidden;
+			position: relative;
+		}
+			.swipe-wrap > section {
+				float:left;
+				position: relative;
+				width:100%;
+			}
+				.info-box .content{
+					margin-bottom: 25px;
+					padding: 0 4px;
+				}
+				.tweet-item{
+					background-color: #FFF;
+					border-radius: 4px;
+					cursor: pointer;
+					margin-bottom: 3px;
+					overflow: hidden;
+				}
+				.tweet-item:hover{
+					background-color: #EEE;
+				}
+					.user-image{
+						display: block;
+						float: left;
+						height: 30px;
+						margin: 3px;
+						width: 30px;
+					}
+					.tweet{
+						margin: 3px 3px 3px 35px;
+					}
+					.tweet-options{
+						background-color: #adadad;
+						clear: both;
+						display: none;
+						height: 30px;
+						padding: 2px 4px;
+					}
+						.tweet-option{
+							background: url("../images/buttons.png") no-repeat;
+							background-position: -40px 0;
+							background-size: 600% 200%;
+							border-left: 1px solid #999;
+							float: right;
+							height: 30px;
+							width: 30px;
+						}
+						.tweet-option:hover{
+							background-color: #c9c9c9;
+						}
+						.reply-option{
+							background-position: -40px 0;
+						}
+							.reply-option:hover{
+								background-position: -40px -30px;
+							}
+						.favorite-option{
+							background-position: -76px 0;
+						}
+							.favorite-option:hover{
+								background-position: -76px -30px;
+							}
+						.retweet-option{
+							background-position: -112px 0;
+						}
+							.retweet-option:hover{
+								background-position: -112px -30px;
+							}
+						.follow-option{
+							background-position: -148px 0;
+						}
+							.follow-option:hover{
+								background-position: -148px -30px;
+							}
+
+#bottom-menu{
+	background-color: #555;
+	bottom: 0;
+	color: #FFF;
+	cursor: pointer;
+	font-size: 2em;
+	font-weight: bold;
+	height: 30px;
+	opacity: 0.9;
+	position: fixed;
+	text-align: center;
+	width: 100%;
+}
+	.bottom-btn{
+		visibility: hidden;
+		float: left;
+		width: 40%;
+	}
+	.bottom-btn:hover{
+		background-color: #000;
+	}
+	.home-btn{
+		background-image: url("../images/home.png");
+		background-repeat: no-repeat;
+		background-position: center 3px;
+	}
+	.account-btn{
+		float: left;
+		height: 5%;
+		line-height: 25px;
+		min-height: 24px;
+		width: 20%;
+	}
+		.inner-account-btn{
+			border: 3px solid #FFF;
+			border-radius: 20px;
+			font-size: 1.1em;
+			margin: 0 auto;
+			width: 24px;
+		}
+		.inner-account-btn:hover{
+			background-color: #FFF;
+			border: 3px solid #000;
+			color: #000;
+		}
+	.extreme-btn{
+	}
+	#account-list{
+		background-color: #000;
+		clear: both;
+		color: #FFF;
+		font-size: 17px;
+		height: 75%;
+		overflow: auto;
+		text-align: left;
+	}
+		.account-item{
+			border-bottom: 1px solid #333;
+			clear: both;
+			cursor: pointer;
+			height: 25px;
+			line-height: 25px;
+			padding: 1px 3px;
+		}
+		.account-item:hover{
+			background-color: #222;
+		}
+			.account-item *{
+				float: left;
+			}
+			.account-item img{
+				height: 23px;
+				margin-right: 3px;
+			}
+			.delete-btn{
+				display: none;
+				cursor: pointer;
+				float: left;
+				height: 25px;
+				margin-left: 10px;
+			}
+				.account-item:hover .delete-btn{
+					display: block;
+				}
+
+	#account-adder{
+		font-size: 0.7em;
+		font-weight: bold;
+		height: 15%;
+		text-align: left;
+	}
+		#account-adder input{
+			background-color: #BBB;
+			border: none;
+			margin-right: 10px;
+		}
+		#add-account-btn:hover{
+			background-color: #000;
+			border-radius: 4px;
+		}
+
+
+#auth-overlay{
+	display: none;
+	height: 100%;
+	left: 0;
+	position: fixed;
+	top: 0;
+	width: 100%;
+	z-index: 999;
+}
+	#close-overlay{
+		background-color: #FFF;
+		border: 3px solid #333;
+		border-radius: 20px;
+		cursor: pointer;
+		font-size: 25px;
+		height: 40px;
+		line-height: 40px;
+		margin: 20px 20px;
+		position: absolute;
+		right: 0;
+		text-align: center;
+		width: 40px;
+		z-index: 1002;
+	}
+	#close-overlay:hover{
+		background-color: #333;
+		border: 3px solid #FFF;
+		color: #FFF;
+	}
+	#auth-box{
+		background-color: #CCC;
+		font-size: 25px;
+		height: 50%;
+		left: 0;
+		margin: 10% 0 0 25%;
+		padding: 1%;
+		position: absolute;
+		text-align: center;
+		top: 0;
+		width: 50%;
+		z-index: 1001;
+	}
+		#auth-box a{
+			color: #00D;
+		}
+	#overlay-bg-cover{
+		background-color: #333;
+		height: 100%;
+		left: 0;
+		opacity: 0.7;
+		position: absolute;
+		top: 0;
+		width: 100%;
+		z-index: 1000;
+	}
