@@ -45,7 +45,7 @@ exports.timeline = function(req, res){
 
 	x.setUser(req.session.user);
 	x.setCurrentAccount(twitterAccountId, function(data){
-		x.loadTimeline(function(data){
+		x.loadTweets('statuses/home_timeline', 'tweets', function(data){
 			res.json(data);
 		});
 	});
@@ -58,11 +58,67 @@ exports.mentions = function(req, res){
 
 	x.setUser(req.session.user);
 	x.setCurrentAccount(twitterAccountId, function(data){
-		x.loadMentions(function(data){
+		x.loadTweets('statuses/mentions_timeline', 'mentions', function(data){
 			res.json(data);
 		});
 	});
 };
+
+// prints json array of favorites
+exports.favorites = function(req, res){
+	var twitterAccountId = req.session.currentAccount;
+
+	x.setUser(req.session.user);
+	x.setCurrentAccount(twitterAccountId, function(data){
+		x.loadTweets('favorites/list', 'favorites', function(data){
+			res.json(data);
+		});
+	});
+};
+
+// prints json array of retweets
+exports.retweets = function(req, res){
+	var twitterAccountId = req.session.currentAccount;
+
+	x.setUser(req.session.user);
+	x.setCurrentAccount(twitterAccountId, function(data){
+		x.loadTweets('statuses/retweets_of_me', 'retweets', function(data){
+			res.json(data);
+		});
+	});
+};
+
+// prints json array of followers
+exports.followers = function(req, res){
+	var twitterAccountId = req.session.currentAccount;
+
+	x.setUser(req.session.user);
+	x.setCurrentAccount(twitterAccountId, function(data){
+		x.loadUsers('followers/list', function(data){
+			res.json(data);
+		});
+	});
+};
+
+// posts a tweet
+exports.postTweet = function(req, res){
+	var twitterAccountId = req.session.currentAccount;
+
+	var status = "";
+	if(req.query.status){
+		status = req.query.status;
+	}
+
+	x.setUser(req.session.user);
+	x.setCurrentAccount(twitterAccountId, function(data){
+		x.postTweet(status, function(data){
+			res.json(data);
+		});
+	});
+};
+
+
+
 
 
 exports.removeAccount = function(req, res){

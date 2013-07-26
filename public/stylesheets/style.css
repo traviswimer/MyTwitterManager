@@ -17,6 +17,7 @@ a{
 }
 	#account-name{
 		color: #FFF;
+		float: left;
 		font-size: 1.2em;
 		font-weight: bold;
 		height: 30px;
@@ -27,6 +28,32 @@ a{
 		height: 25px;
 		margin: 2px 4px 0 4px;
 	}
+	#tweet-writer{
+		float: right;
+		width: 50%;
+	}
+		#tweet-input{
+			background-color: #848484;
+			border: 1px solid #4A4A4A;
+			font-weight: bold;
+			height: 20px;
+			outline: none;
+			padding: 3px 7px;
+			position: absolute;
+			width: 35%;
+		}
+		#tweet-input:focus{
+			background-color: #DEDEDE;
+			color: 000;
+			font-weight: normal;
+			height: 200px;
+		}
+		#tweet-submit{
+			border: 0;
+			margin: 0 0 0 75%;
+			padding: 3px;
+			width: 20%;
+		}
 	#header-buttons{
 		background: rgb(119,119,119); /* Old browsers */
 		background: -moz-linear-gradient(top,  rgba(119,119,119,1) 0%, rgba(68,68,68,1) 100%); /* FF3.6+ */
@@ -38,6 +65,7 @@ a{
 		filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#777777', endColorstr='#444444',GradientType=0 ); /* IE6-9 */
 
 		border-bottom: 1px solid #333;
+		clear: both;
 		height: 45px;
 		margin: 0 auto;
 		text-align: center;
@@ -95,10 +123,10 @@ a{
 			#retweets-btn.selected{
 				background-position: -168px -45px;
 			}
-		#follows-btn{
+		#followers-btn{
 			background-position: -223px 0;
 		}
-			#follows-btn.selected{
+			#followers-btn.selected{
 				background-position: -223px -45px;
 			}
 
@@ -165,25 +193,25 @@ a{
 						.reply-option{
 							background-position: -40px 0;
 						}
-							.reply-option:hover{
+							.reply-option.selected{
 								background-position: -40px -30px;
 							}
 						.favorite-option{
 							background-position: -76px 0;
 						}
-							.favorite-option:hover{
+							.favorite-option.selected{
 								background-position: -76px -30px;
 							}
 						.retweet-option{
 							background-position: -112px 0;
 						}
-							.retweet-option:hover{
+							.retweet-option.selected{
 								background-position: -112px -30px;
 							}
 						.follow-option{
 							background-position: -148px 0;
 						}
-							.follow-option:hover{
+							.follow-option.selected{
 								background-position: -148px -30px;
 							}
 

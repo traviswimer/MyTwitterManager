@@ -18,7 +18,7 @@ module.exports = (function(){
 
 	// App auth info
 	var CONSUMER_KEY = 'xxxxxxxxxxxxxxxxxxxxx';
-	var CONSUMER_SECRET = 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx';
+	var CONSUMER_SECRET = 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx';
 
 /*____________________________________________________________________________*/
 
@@ -38,14 +38,14 @@ module.exports = (function(){
 
 
 	// makes API request to twitter for timeline
-	function loadTimelineFromTwitter(models, lastTweetId, callback){
+	function loadFromTwitter(twitterRequest, subdocumentName, models, lastTweetId, callback){
 		var requestParams = {};
 		if(lastTweetId){
 			requestParams.since_id = lastTweetId;
 		}
-		currentTwitterAccount.get('statuses/home_timeline', requestParams, function(err, reply){
+		currentTwitterAccount.get(twitterRequest, requestParams, function(err, reply){
 			var tweetInfo = [];
-			tweets = reply || false;
+			var tweets = reply || false;
 
 			for(var i=0; i<tweets.length; i++){
 				var tweetToAdd = {};
@@ -59,21 +59,29 @@ module.exports = (function(){
 					tempTweet = tweets[i];
 				}
 
+
 				// add tweet ID
 				tweetToAdd.tweet_id = tempTweet.id;
-
 				// create links in tweet
 				tweetToAdd.text = convertTweetLinks(tempTweet.text);
-
 				// add timestamp
 				tweetToAdd.timestamp = convertTwitterDateToTimestamp(tempTweet.created_at);
-
 				// add user pic
 				tweetToAdd.profile_image_url = tempTweet.user.profile_image_url;
+				// add boolean if user is following this user
+				tweetToAdd.username = tempTweet.user.screen_name;
+				// add boolean if user is following this user
+				tweetToAdd.is_following = tempTweet.user.following;
+				// add boolean if user has favorited the tweet
+				tweetToAdd.favorited = tempTweet.favorited;
+				// add boolean if user has retweeted the tweet
+				tweetToAdd.retweeted = tempTweet.retweeted;
 
 				// add to array
 				tweetInfo.push(tweetToAdd);
-				//console.dir(tweetToAdd);
+
+				var setAdder = {};
+				setAdder['accounts.$.'+subdocumentName] = tweetToAdd;
 
 				// add to database
 				models.User.update(
@@ -82,9 +90,7 @@ module.exports = (function(){
 						'accounts._id': currentTwitterAccountId
 					},
 					{
-						$addToSet: {
-							'accounts.$.tweets': tweetToAdd
-						}
+						$addToSet: setAdder
 					},
 					function(error, result){
 						if(error){
@@ -96,63 +102,6 @@ module.exports = (function(){
 				);
 			}
 
-
-			callback(tweetInfo);
-		});
-	}
-
-
-
-	// Requests mentions from twitter
-	function loadMentionsFromTwitter(models, lastTweetId, callback){
-		var requestParams = {};
-		if(lastTweetId){
-			requestParams.since_id = lastTweetId;
-		}
-		currentTwitterAccount.get('statuses/mentions_timeline', requestParams, function(err, reply) {
-			var tweetInfo = [];
-			tweets = reply || false;
-
-			for(var i=0; i<tweets.length; i++){
-				var tweetToAdd = {};
-				var theTweet = tweets[i];
-
-				// add tweet ID
-				tweetToAdd.tweet_id = theTweet.id;
-
-				// create links in tweet
-				tweetToAdd.text = convertTweetLinks(theTweet.text);
-
-				// add timestamp
-				tweetToAdd.timestamp = convertTwitterDateToTimestamp(theTweet.created_at);
-
-				// add user pic
-				tweetToAdd.profile_image_url = theTweet.user.profile_image_url;
-
-				// add to array
-				tweetInfo.push(tweetToAdd);
-
-
-				// add to database
-				models.User.update(
-					{
-						_id: userId,
-						'accounts._id': currentTwitterAccountId
-					},
-					{
-						$addToSet: {
-							'accounts.$.mentions': tweetToAdd
-						}
-					},
-					function(error, result){
-						if(error){
-							console.log("err adding tweets: "+error);
-						}else{
-							// tweet added
-						}
-					}
-				);
-			}
 
 			callback(tweetInfo);
 		});
@@ -175,6 +124,60 @@ module.exports = (function(){
 	// Converts the format of twitter's "created_at" to a timestamp
 	function convertTwitterDateToTimestamp(twitterDate){
 		return new Date(Date.parse(twitterDate.replace(/( \+)/, ' UTC$1'))).getTime();
+	}
+
+
+	// Obtains tweets from a document
+	function getTweetsFromDatabase(documentName, callback){
+		database.getModels(function(models){
+			models[documentName].find(
+				{
+					_id: userId,
+					'accounts._id': currentTwitterAccountId
+				}
+			).sort(
+				{
+					"accounts.tweets.tweet_id": -1
+				}
+			).limit(
+				20
+			).exec(
+				function(err, items){
+					var tweets = items[0].accounts[0].tweets;
+					if(!err && tweets && tweets.length > 0){
+						loadTimelineFromTwitter(models, tweets[0].tweet_id, function(newTweetArray){
+							var returnArray = newTweetArray;
+
+							// Combine array of previous and new tweets if necessary
+							if(newTweetArray.length < 20){
+								var numOldTweetsNeeded = 20 - newTweetArray.length;
+								var slicedTweets = tweets.slice(0, numOldTweetsNeeded);
+								returnArray = newTweetArray.concat(slicedTweets);
+							}
+
+							callback(returnArray);
+						});
+					}else{
+						loadTimelineFromTwitter(models, false, callback);
+					}
+				}
+			);
+		});
+	}
+
+
+	// Combines cached tweets with tweets loaded from twitter
+	function combineNewAndOldTweets(newTweets, oldTweets){
+		var returnArray = newTweets;
+
+		// Combine array of previous and new tweets if necessary
+		if(newTweets.length < 20){
+			var numOldTweetsNeeded = 20 - newTweets.length;
+			var slicedTweets = oldTweets.slice(0, numOldTweetsNeeded);
+			returnArray = newTweets.concat(slicedTweets);
+		}
+
+		return returnArray;
 	}
 
 /*____________________________________________________________________________*/
@@ -296,42 +299,15 @@ module.exports = (function(){
 	}
 
 
-	// Retrieves the authenticated user's timeline( array of tweet objects )
-	function loadTimeline(callback){
-
-		database.getModels(function(models){
-			models.User.find(
-				{
-					_id: userId,
-					'accounts._id': currentTwitterAccountId
-				}
-			).sort(
-				{
-					"accounts.tweets.tweet_id": -1
-				}
-			).exec(
-				function(err, items){
-					var tweets = items[0].accounts[0].tweets;
-					if(!err && tweets && tweets.length > 0){
-						loadTimelineFromTwitter(models, tweets[0].tweet_id, function(newTweetArray){
-							// Combine array of previous and new tweets
-							var returnArray = newTweetArray.concat(tweets);
-							callback(returnArray);
-						});
-					}else{
-						loadTimelineFromTwitter(models, false, callback);
-					}
-				}
-			);
-		});
-
-	}
 
 
 	// Retrieves the authenticated user's mentions( array of tweet objects )
-	function loadMentions(callback){
+	function loadTweets(action, subdocument, callback){
 
 		database.getModels(function(models){
+
+			var sortOptions = {};
+			sortOptions["accounts."+subdocument+".tweet_id"] = -1;
 
 			models.User.find(
 				{
@@ -346,20 +322,19 @@ module.exports = (function(){
 					}
 				}
 			).sort(
-				{
-					"accounts.mentions.tweet_id": -1
-				}
+				sortOptions
 			).exec(
 				function(err, items){
-					var mentions = items[0].accounts[0].mentions;
-					if(!err && mentions && mentions.length > 0){
-						loadMentionsFromTwitter(models, mentions[0].tweet_id, function(newTweetArray){
-							// Combine array of previous and new mentions
-							var returnArray = newTweetArray.concat(mentions);
-							callback(returnArray);
+					var tweets = items[0].accounts[0][subdocument];
+					if(!err && tweets && tweets.length > 0){
+						loadFromTwitter(action, subdocument, models, tweets[0].tweet_id, function(newTweetArray){
+							// Combine array of previous and new tweets
+							var past20tweets = combineNewAndOldTweets(newTweetArray, tweets);
+
+							callback(past20tweets);
 						});
 					}else{
-						loadMentionsFromTwitter(models, false, callback);
+						loadFromTwitter(action, subdocument, models, false, callback);
 					}
 				}
 			);
@@ -367,6 +342,83 @@ module.exports = (function(){
 
 		});
 	}
+
+
+	// loads current user's followers
+	function loadUsers(action, callback){
+		database.getModels(function(models){
+
+			models.User.find(
+				{
+					_id: userId,
+					'accounts._id': currentTwitterAccountId
+				},
+				{
+					accounts: {
+						$elemMatch: {
+							_id: currentTwitterAccountId
+						}
+					}
+				}
+			).exec(
+				function(err, items){
+					var userScreenName = items[0].accounts[0].screen_name;
+
+					var requestParams = {};
+					requestParams.screen_name = userScreenName;
+
+
+					currentTwitterAccount.get(action, requestParams, function(err, reply){
+						var usersInfo = [];
+						var users = reply.users || false;
+
+						console.dir(reply);
+
+						for(var i=0; i<users.length; i++){
+							var usersObj = {};
+							usersObj.screen_name = users[i].screen_name;
+							usersObj.profile_image_url = users[i].profile_image_url;
+							usersObj.description = users[i].description;
+							usersInfo.push(usersObj);
+						}
+
+						callback(usersInfo);
+					});
+
+				}
+			);
+
+
+
+		});
+	}
+
+
+	// posts a tweet for the current user
+	function postTweet(status, callback){
+
+		if(status.length <= 140 && status.length > 0){
+			var requestParams = {};
+			requestParams.status = status;
+
+			var action = 'statuses/update';
+
+			currentTwitterAccount.post(action, requestParams, function(err, reply){
+				if(!err){
+					callback({success: true});
+				}else{
+					callback({success: false, error: 'Error posting to Twitter'});
+				}
+			});
+
+		}else{
+			// return false if tweet is invalid
+			callback({success: false, error: 'Invalid tweet'});
+		}
+
+	}
+
+
 
 
 	// adds a new Twitter account
@@ -451,8 +503,9 @@ module.exports = (function(){
 		setCurrentAccount: setCurrentAccount,
 		getAccounts: getAccounts,
 		getAccountInfo: getAccountInfo,
-		loadTimeline: loadTimeline,
-		loadMentions: loadMentions,
+		loadTweets: loadTweets,
+		loadUsers: loadUsers,
+		postTweet: postTweet,
 		addAccount: addAccount,
 		removeAccount: removeAccount
 	};

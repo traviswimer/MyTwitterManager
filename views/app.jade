@@ -5,17 +5,20 @@ block content
 		div#account-name
 			img(src=picSrc)
 			span @#{accountName}
+		div#tweet-writer
+			textarea(id='tweet-input', placeholder='Write tweet...')
+			input(type='button', id='tweet-submit', value='Post')
 		div#header-buttons
 			div.header-btn
 				div#tweets-btn.button-icon.selected
 			div.header-btn
 				div#mentions-btn.button-icon
-			//-div.header-btn
+			div.header-btn
 				div#favorites-btn.button-icon
-			//-div.header-btn
+			div.header-btn
 				div#retweets-btn.button-icon
-			//-div.header-btn
-				div#follows-btn.button-icon
+			div.header-btn
+				div#followers-btn.button-icon
 
 	section#main-section.swipe
 		div.swipe-wrap
@@ -35,7 +38,7 @@ block content
 				div.content
 					div.tweet-item Loading...
 
-			section#follows.info-box
+			section#followers.info-box
 				div.content
 					div.tweet-item Loading...
 

@@ -35,12 +35,15 @@ $(function(){
 		transitionToSlide(1);
 	});
 	$('#favorites-btn').parent().click(function(){
+		loadFavorites();
 		transitionToSlide(2);
 	});
 	$('#retweets-btn').parent().click(function(){
+		loadRetweets();
 		transitionToSlide(3);
 	});
-	$('#follows-btn').parent().click(function(){
+	$('#followers-btn').parent().click(function(){
+		loadFollowers();
 		transitionToSlide(4);
 	});
 
@@ -56,6 +59,9 @@ $(function(){
 	$('#close-overlay').click(function(){
 		$('#auth-overlay').hide();
 	});
+
+	// Post a tweet
+	$('#tweet-submit').click(postTweet);
 
 //                                                                 //
 /////////////////////////////////////////////////////////////////////
@@ -98,16 +104,19 @@ $(function(){
 					replyOption.className = "tweet-option reply-option";
 					tweetOptions.appendChild(replyOption);
 					// - option: retweet
+					var hasRetweeted = data[i].retweeted ? " selected" : "";
 					var retweetOption = document.createElement('div');
-					retweetOption.className = "tweet-option retweet-option";
+					retweetOption.className = "tweet-option retweet-option"+hasRetweeted;
 					tweetOptions.appendChild(retweetOption);
 					// - option: favorite
+					var hasFavorited = data[i].favorited ? " selected" : "";
 					var favoriteOption = document.createElement('div');
-					favoriteOption.className = "tweet-option favorite-option";
+					favoriteOption.className = "tweet-option favorite-option"+hasFavorited;
 					tweetOptions.appendChild(favoriteOption);
 					// - option: follow
+					var hasFollowed = data[i].is_following ? " selected" : "";
 					var followOption = document.createElement('div');
-					followOption.className = "tweet-option follow-option";
+					followOption.className = "tweet-option follow-option"+hasFollowed;
 					tweetOptions.appendChild(followOption);
 
 
@@ -127,6 +136,62 @@ $(function(){
 			}
 			containerNode.children[0].innerHTML = "";
 			containerNode.children[0].appendChild(mentionsFragment);
+
+		}
+	}
+
+
+	// Appends a list of users to a the specified DOM node
+	function appendUserList(containerNode, data){
+		if(data && data.length){
+			var usersFragment = document.createDocumentFragment();
+			for(var i=0; i<data.length; i++){
+
+				// Create a unique scope for each user
+				// Variables say 'tweet' a lot, but that's just because I'm lazy
+				(function(){
+					// Tweet container
+					var theTweet = document.createElement('div');
+					theTweet.className = "tweet-item";
+
+					// tweet image
+					var tweetImg = document.createElement('img');
+					tweetImg.className = "user-image";
+					tweetImg.src = data[i].profile_image_url;
+
+					// tweet text content
+					var tweetText = document.createElement('div');
+					tweetText.className = "tweet";
+					tweetText.innerHTML = data[i].screen_name+" - "+data[i].description;
+
+
+					// tweet options
+					var tweetOptions = document.createElement('div');
+					tweetOptions.className = "tweet-options";
+
+					// - option: follow
+					var hasFollowed = data[i].is_following ? " selected" : "";
+					var followOption = document.createElement('div');
+					followOption.className = "tweet-option follow-option"+hasFollowed;
+					tweetOptions.appendChild(followOption);
+
+
+
+
+					theTweet.appendChild(tweetImg);
+					theTweet.appendChild(tweetText);
+					theTweet.appendChild(tweetOptions);
+
+					$(theTweet).click(function(){
+						$(tweetOptions).toggle();
+					});
+
+					usersFragment.appendChild(theTweet);
+				}());
+
+			}
+			containerNode.children[0].innerHTML = "";
+			containerNode.children[0].appendChild(usersFragment);
 
 		}
 	}
@@ -152,6 +217,11 @@ $(function(){
 					var acctName = document.createElement('span');
 					acctName.innerHTML = "@"+accountsArray[i].screen_name;
 					acctName.addEventListener("click", function(){
+						// clear last account's data
+						document.querySelector('#tweets .content').innerHTML = "Loading...";
+						document.querySelector('#mentions .content').innerHTML = "Loading...";
+
+						// Load data
 						loadTimeline(accountId, function(){
 							loadAccountInfo(accountId);
 							transitionToSlide(0);
@@ -162,7 +232,11 @@ $(function(){
 					acctDeleter.src = "images/delete.png";
 					acctDeleter.className = "delete-btn";
 					acctDeleter.addEventListener("click",function(){
-						deleteAccount(accountId);
+						var confirmDelete = confirm('Are you sure you want to permanently delete this account?');
+						
+						if(confirmDelete){
+							deleteAccount(accountId);
+						}
 					});
 
 					newDiv.appendChild(newImg);
@@ -206,7 +280,6 @@ $(function(){
 		$.get('./ajax/timeline', {acctId: acctId}, function(data){
 			var timelineContainer = document.getElementById('tweets');
 			appendTweetList(timelineContainer, data);
-
 			if(callback){ callback(); }
 		},'json');
 	}
@@ -219,8 +292,57 @@ $(function(){
 		},'json');
 	}
 
+	// Loads favorites
+	function loadFavorites(){
+		$.get('./ajax/favorites', {}, function(data){
+			var favoritesContainer = document.getElementById('favorites');
+			appendTweetList(favoritesContainer, data);
+		},'json');
+	}
+
+	// Loads retweets
+	function loadRetweets(){
+		$.get('./ajax/retweets', {}, function(data){
+			var retweetsContainer = document.getElementById('retweets');
+			appendTweetList(retweetsContainer, data);
+		},'json');
+	}
+
+	// Loads followers
+	function loadFollowers(){
+		$.get('./ajax/followers', {}, function(data){
+			var followersContainer = document.getElementById('followers');
+			appendUserList(followersContainer, data);
+		},'json');
+	}
+
+	// Posts a Tweet
+	function postTweet(){
+		var status = $('#tweet-input').val();
+		$('#tweet-input').attr("disabled", "disabled");
+		$('#tweet-submit').val('Posting...').attr("disabled", "disabled");
+
+		$.get('./ajax/postTweet', {status: status}, function(data){
+			if(data && data.success){
+				$('#tweet-input').val("").removeAttr("disabled");
+				$('#tweet-submit').val('Posted!').removeAttr("disabled");
+			}else{
+				alert(data.error);
+			}
+			$('#tweet-input').removeAttr("disabled");
+			$('#tweet-submit').removeAttr("disabled");
+			setTimeout(function(){
+				$('#tweet-submit').val('Post');
+			}, 1000);
+		},'json');
+	}
+
+
+
 	// deletes an account
 	function deleteAccount(accountId){
+
+		postTweet
 		$.get('./ajax/remove_account', {"acctId": accountId}, function(data){
 			if(data && data.success){
 				$('#account-item-'+accountId).remove();

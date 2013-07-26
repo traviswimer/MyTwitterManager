@@ -17,13 +17,17 @@ module.exports = (function(){
 		console.log("connected to database");
 		models = {};
 
-		// accounts document
+		// tweers document
 		////////////////////////////////
 		var tweets = mongoose.Schema({
 			tweet_id: Number,
 			timestamp: Number,
 			profile_image_url: String,
-			text: String
+			text: String,
+			username: String,
+			is_following: Boolean,
+			favorited: Boolean,
+			retweeted: Boolean
 		});
 
 		// accounts document
@@ -36,7 +40,9 @@ module.exports = (function(){
 			access_token: String,
 			access_token_secret: String,
 			tweets: [tweets],
-			mentions: [tweets]
+			mentions: [tweets],
+			favorites: [tweets],
+			retweets: [tweets]
 		});
 
 		// Users document
