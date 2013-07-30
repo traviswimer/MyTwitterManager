@@ -64,12 +64,19 @@ app.post('/', function(req, res){
 app.get('/app', appRoute.app);
 app.get('/ajax/load_accounts', ajax.loadAccounts);
 app.get('/ajax/account', ajax.account);
+
 app.get('/ajax/timeline', ajax.timeline);
 app.get('/ajax/mentions', ajax.mentions);
 app.get('/ajax/favorites', ajax.favorites);
 app.get('/ajax/retweets', ajax.retweets);
 app.get('/ajax/followers', ajax.followers);
+
 app.get('/ajax/postTweet', ajax.postTweet);
+app.get('/ajax/makeFavorite', ajax.makeFavorite);
+app.get('/ajax/makeRetweet', ajax.makeRetweet);
+app.get('/ajax/follow', ajax.follow);
+
+
 app.get('/ajax/remove_account', ajax.removeAccount);
 app.get('/ajax/oauth', ajax.oauth);
 app.get('/oauthed', ajax.oauthed);

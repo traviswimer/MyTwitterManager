@@ -5,9 +5,9 @@ block content
 		div#account-name
 			img(src=picSrc)
 			span @#{accountName}
-		div#tweet-writer
+		form#tweet-writer
 			textarea(id='tweet-input', placeholder='Write tweet...')
-			input(type='button', id='tweet-submit', value='Post')
+			input(type='submit', id='tweet-submit', value='Post')
 		div#header-buttons
 			div.header-btn
 				div#tweets-btn.button-icon.selected
@@ -52,10 +52,19 @@ block content
 		section#account-adder
 			span#add-account-btn + Add Account
 
-	section#auth-overlay
-		div#close-overlay X
-		div#auth-box
-		div#overlay-bg-cover
+	section#auth-overlay.overlay
+		div#close-overlay.close-overlay X
+		div#auth-box.overlay-box
+		div.overlay-bg-cover
+
+	section#reply-overlay.overlay
+		div#close-reply-overlay.close-overlay X
+		div#reply-box.overlay-box
+			form#reply-writer
+				textarea(id='reply-input', placeholder='Write reply...')
+				input(type='hidden', id='is-reply-to', value='0')
+				input(type='submit', id='reply-submit', value='Post')
+		div.overlay-bg-cover
 
 	script(src="javascripts/swipe.js")
 	script(src="javascripts/main.js")

@@ -17,7 +17,7 @@ module.exports = (function(){
 	var currentTwitterAccount;
 
 	// App auth info
-	var CONSUMER_KEY = 'xxxxxxxxxxxxxxxxxxxxx';
+	var CONSUMER_KEY = 'xxxxxxxxxxxxxxxxxxxxxx';
 	var CONSUMER_SECRET = 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx';
 
 /*____________________________________________________________________________*/
@@ -61,7 +61,7 @@ module.exports = (function(){
 
 
 				// add tweet ID
-				tweetToAdd.tweet_id = tempTweet.id;
+				tweetToAdd.tweet_id = tempTweet.id_str;
 				// create links in tweet
 				tweetToAdd.text = convertTweetLinks(tempTweet.text);
 				// add timestamp
@@ -372,8 +372,6 @@ module.exports = (function(){
 						var usersInfo = [];
 						var users = reply.users || false;
 
-						console.dir(reply);
-
 						for(var i=0; i<users.length; i++){
 							var usersObj = {};
 							usersObj.screen_name = users[i].screen_name;
@@ -395,11 +393,14 @@ module.exports = (function(){
 
 
 	// posts a tweet for the current user
-	function postTweet(status, callback){
+	function postTweet(status, isReplyTo, callback){
 
 		if(status.length <= 140 && status.length > 0){
 			var requestParams = {};
 			requestParams.status = status;
+			if(isReplyTo){
+				requestParams.in_reply_to_status_id = isReplyTo;
+			}
 
 			var action = 'statuses/update';
 
@@ -414,6 +415,90 @@ module.exports = (function(){
 		}else{
 			// return false if tweet is invalid
 			callback({success: false, error: 'Invalid tweet'});
+		}
+
+	}
+
+
+	// favorites/unfavorites a tweet
+	function makeFavorite(tweetId, unfavorite, callback){
+
+		if(tweetId){
+			var requestParams = {};
+			requestParams.id = tweetId;
+
+			var action = 'favorites/create';
+			if(unfavorite){
+				action = 'favorites/destroy';
+			}
+
+			currentTwitterAccount.post(action, requestParams, function(err, reply){
+				if(!err){
+					callback({success: true});
+				}else{
+					callback({success: false, error: 'Twitter could not favorite this tweet'});
+				}
+			});
+
+		}else{
+			// return false if tweet is invalid
+			callback({success: false, error: 'Invalid tweet ID'});
+		}
+
+	}
+
+
+	// retweets/unretweets a tweet
+	function makeRetweet(tweetId, unretweet, callback){
+
+		if(tweetId){
+			var requestParams = {};
+
+			var action = 'statuses/retweet/'+tweetId;
+			if(unretweet){
+				action = 'statuses/destroy/'+tweetId;
+			}
+
+			currentTwitterAccount.post(action, requestParams, function(err, reply){
+				if(!err){
+					callback({success: true, statusId: reply.id_str});
+				}else{
+					callback({success: false, error: 'Twitter could not retweet this tweet'});
+				}
+			});
+
+		}else{
+			// return false if tweet is invalid
+			callback({success: false, error: 'Invalid tweet ID'});
+		}
+
+	}
+
+
+	// follows/unfollows a user
+	function follow(username, unfollow, callback){
+
+		if(username){
+			var requestParams = {
+				'screen_name': username
+			};
+
+			var action = 'friendships/create';
+			if(unfollow){
+				action = 'friendships/destroy';
+			}
+
+			currentTwitterAccount.post(action, requestParams, function(err, reply){
+				if(!err){
+					callback({success: true});
+				}else{
+					callback({success: false, error: 'Twitter could not follow this user'});
+				}
+			});
+
+		}else{
+			// return false if tweet is invalid
+			callback({success: false, error: 'Invalid username'});
 		}
 
 	}
@@ -506,6 +591,9 @@ module.exports = (function(){
 		loadTweets: loadTweets,
 		loadUsers: loadUsers,
 		postTweet: postTweet,
+		makeFavorite: makeFavorite,
+		makeRetweet: makeRetweet,
+		follow: follow,
 		addAccount: addAccount,
 		removeAccount: removeAccount
 	};

@@ -317,7 +317,7 @@ a{
 		}
 
 
-#auth-overlay{
+.overlay{
 	display: none;
 	height: 100%;
 	left: 0;
@@ -326,7 +326,7 @@ a{
 	width: 100%;
 	z-index: 999;
 }
-	#close-overlay{
+	.close-overlay{
 		background-color: #FFF;
 		border: 3px solid #333;
 		border-radius: 20px;
@@ -341,12 +341,12 @@ a{
 		width: 40px;
 		z-index: 1002;
 	}
-	#close-overlay:hover{
+	.close-overlay:hover{
 		background-color: #333;
 		border: 3px solid #FFF;
 		color: #FFF;
 	}
-	#auth-box{
+	.overlay-box{
 		background-color: #CCC;
 		font-size: 25px;
 		height: 50%;
@@ -359,10 +359,10 @@ a{
 		width: 50%;
 		z-index: 1001;
 	}
-		#auth-box a{
+		.overlay-box a{
 			color: #00D;
 		}
-	#overlay-bg-cover{
+	.overlay-bg-cover{
 		background-color: #333;
 		height: 100%;
 		left: 0;
@@ -372,3 +372,37 @@ a{
 		width: 100%;
 		z-index: 1000;
 	}
+
+
+	#reply-writer{
+
+	}
+		#reply-input{
+			background-color: #848484;
+			border: 1px solid #4A4A4A;
+			font-weight: bold;
+			height: 10em;
+			outline: none;
+			padding: 3px 7px;
+			width: 95%;
+		}
+		#reply-input:focus{
+			background-color: #FFF;
+		}
+		#reply-submit{
+			background: rgb(128,234,126); /* Old browsers */
+			background: -moz-linear-gradient(top,  rgba(128,234,126,1) 28%, rgba(31,155,35,1) 100%); /* FF3.6+ */
+			background: -webkit-gradient(linear, left top, left bottom, color-stop(28%,rgba(128,234,126,1)), color-stop(100%,rgba(31,155,35,1))); /* Chrome,Safari4+ */
+			background: -webkit-linear-gradient(top,  rgba(128,234,126,1) 28%,rgba(31,155,35,1) 100%); /* Chrome10+,Safari5.1+ */
+			background: -o-linear-gradient(top,  rgba(128,234,126,1) 28%,rgba(31,155,35,1) 100%); /* Opera 11.10+ */
+			background: -ms-linear-gradient(top,  rgba(128,234,126,1) 28%,rgba(31,155,35,1) 100%); /* IE10+ */
+			background: linear-gradient(to bottom,  rgba(128,234,126,1) 28%,rgba(31,155,35,1) 100%); /* W3C */
+			filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#80ea7e', endColorstr='#1f9b23',GradientType=0 ); /* IE6-9 */
+
+			border: 0;
+			border-radius: 8px;
+			cursor: pointer;
+			font-size: 1.6em;
+			font-weight: bold;
+			width: 100%;
+		}

@@ -105,13 +105,80 @@ exports.postTweet = function(req, res){
 	var twitterAccountId = req.session.currentAccount;
 
 	var status = "";
+	var isReplyTo = false;
 	if(req.query.status){
 		status = req.query.status;
+	}
+	if(req.query.isReplyTo && req.query.isReplyTo !== "0"){
+		isReplyTo = req.query.isReplyTo;
 	}
 
 	x.setUser(req.session.user);
 	x.setCurrentAccount(twitterAccountId, function(data){
-		x.postTweet(status, function(data){
+		x.postTweet(status, isReplyTo, function(data){
+			res.json(data);
+		});
+	});
+};
+
+
+// favorites/unfavorites a tweet
+exports.makeFavorite = function(req, res){
+	var twitterAccountId = req.session.currentAccount;
+
+	var tweetId = false;
+	var unfavorite = false;
+	if(req.query.tweetId){
+		tweetId = req.query.tweetId;
+	}
+	if(req.query.unfavorite){
+		unfavorite = req.query.unfavorite;
+	}
+	x.setUser(req.session.user);
+	x.setCurrentAccount(twitterAccountId, function(data){
+		x.makeFavorite(tweetId, unfavorite, function(data){
+			res.json(data);
+		});
+	});
+};
+
+
+// retweets/unretweets a tweet
+exports.makeRetweet = function(req, res){
+	var twitterAccountId = req.session.currentAccount;
+
+	var tweetId = false;
+	var unretweet = false;
+	if(req.query.tweetId){
+		tweetId = req.query.tweetId;
+	}
+	if(req.query.unretweet){
+		unretweet = req.query.unretweet;
+	}
+	x.setUser(req.session.user);
+	x.setCurrentAccount(twitterAccountId, function(data){
+		x.makeRetweet(tweetId, unretweet, function(data){
+			res.json(data);
+		});
+	});
+};
+
+
+// follow/unfollow a user
+exports.follow = function(req, res){
+	var twitterAccountId = req.session.currentAccount;
+
+	var username = false;
+	var unfollow = false;
+	if(req.query.username){
+		username = req.query.username;
+	}
+	if(req.query.unfollow){
+		unfollow = req.query.unfollow;
+	}
+	x.setUser(req.session.user);
+	x.setCurrentAccount(twitterAccountId, function(data){
+		x.follow(username, unfollow, function(data){
 			res.json(data);
 		});
 	});
